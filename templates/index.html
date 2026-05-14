@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manhwa Scraper Pro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Manhwa <span>Scraper</span> Pro</h1>
+            <p>Download chapter manhwa favoritmu dengan mudah.</p>
+        </header>
+
+        <main class="glass-card">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('scraper')">Auto Scraper</button>
+                <button class="tab-btn" onclick="switchTab('injector')">Bypass Injector</button>
+                <button class="tab-btn" onclick="switchTab('sorter')">Link Sorter</button>
+            </div>
+
+            <div id="scraper-tab" class="tab-pane">
+                <div class="input-group">
+                    <label for="referer_url">URL Halaman Chapter</label>
+                    <input type="text" id="referer_url" placeholder="https://kunmanga.com/manga/judul/chapter-26/" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label for="html_content">Kode Inspect (outerHTML) / Daftar Link</label>
+                    <textarea id="html_content" placeholder="Paste kode HTML atau daftar link di sini..."></textarea>
+                </div>
+                <button id="start-btn" class="btn-primary">Mulai Download (ZIP)</button>
+                
+                <div id="status-container" class="status-box hidden">
+                    <div class="progress-wrapper">
+                        <div class="progress-info">
+                            <span id="progress-label">Menunggu...</span>
+                            <span id="progress-percent">0%</span>
+                        </div>
+                        <div class="progress-bar"><div id="progress-fill"></div></div>
+                    </div>
+                    <div id="log-output" class="console-log"></div>
+                </div>
+            </div>
+
+            <div id="injector-tab" class="tab-pane hidden">
+                <div class="info-banner">
+                    <h3>🚀 Pusat Senjata Bypass</h3>
+                    <p>Pilih mode yang paling cocok untuk situs manhwa-mu.</p>
+                </div>
+
+                <div class="injector-grid">
+                    <div class="injector-card">
+                        <h4>⚡ Mode 1: Direct Download (V3)</h4>
+                        <p>Cepat, langsung jadi ZIP di browser. Cocok untuk situs biasa (Mangaforfree, dll).</p>
+                        <textarea id="code-v3" readonly>(async () => { console.log('Bypass V3 Start...'); const r = await fetch('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'); const t = await r.text(); eval(t); const zip = new JSZip(); const imgs = Array.from(document.querySelectorAll('img.wp-manga-chapter-img, .reading-content img, .wp-manga-chapter-img img, .page-break img')); const p = imgs.map(async (img, i) => { try { let url = (img.src || img.dataset.src || img.getAttribute('data-src') || '').trim(); if (url) { if (url.startsWith('//')) url = 'https:' + url; if (url.startsWith('http:')) url = url.replace('http:', 'https:'); const res = await fetch(url); const blob = await res.blob(); zip.file(`${(i + 1).toString().padStart(3, '0')}.jpg`, blob); } } catch (e) {} }); await Promise.all(p); const content = await zip.generateAsync({type: 'blob'}); const a = document.createElement('a'); a.href = URL.createObjectURL(content); a.download = 'Manhwa_Download_V3.zip'; a.click(); })();</textarea>
+                        <button class="btn-primary btn-small" onclick="copyCode('code-v3')">Copy Kode V3</button>
+                    </div>
+
+                    <div class="injector-card">
+                        <h4>🛡️ Mode 2: Link Extractor (V5)</h4>
+                        <p>Paling Ampuh. Digunakan jika V3 error (CORS). Paste hasilnya ke Link Sorter.</p>
+                        <textarea id="code-v5" readonly>(function(){ const imgs = Array.from(document.querySelectorAll('img')).filter(img => { const src = (img.src || img.dataset.src || '').toLowerCase(); return src.includes('http') && (src.includes('manga') || src.includes('chapter') || src.includes('uploads') || img.width > 300); }); const urls = imgs.map(img => (img.src || img.dataset.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || '').trim()).filter(u => u !== ''); copy(urls.join('\n')); console.log('%c[V5] BERHASIL!', 'color: lime; font-weight: bold;'); console.log(`${urls.length} Link di-Copy ke Clipboard.`); })();</textarea>
+                        <button class="btn-primary btn-small" onclick="copyCode('code-v5')">Copy Kode V5</button>
+                    </div>
+                </div>
+                <p style="margin-top: 15px; font-size: 0.8rem; color: var(--text-dim); text-align: center;">Tips: Jika V3 muncul error "CORS" merah-merah di console, gunakan V5.</p>
+            </div>
+
+            <div id="sorter-tab" class="tab-pane hidden">
+                <div class="input-group">
+                    <label for="sorter_html">Masukkan Kode HTML / Daftar Link</label>
+                    <textarea id="sorter_html" placeholder="Paste daftar link gambar atau kode HTML di sini..."></textarea>
+                </div>
+                
+                <!-- TOGGLE SORTIR -->
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                    <input type="checkbox" id="enable-sort" style="width: 18px; height: 18px; cursor: pointer;">
+                    <label for="enable-sort" style="cursor: pointer; font-size: 0.9rem; color: var(--text-main);">Urutkan Nomor Otomatis (Gunakan jika link berantakan)</label>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="btn-primary" onclick="extractLinks()" style="flex: 1;">Preview & Sort</button>
+                    <button id="sorter-download-btn" class="btn-success" onclick="downloadSortedZip()" style="flex: 1;">Download as ZIP</button>
+                </div>
+                <div id="sorter-status" class="status-box hidden">
+                    <div class="progress-wrapper">
+                        <div class="progress-info">
+                            <span id="sorter-progress-label">Menunggu...</span>
+                            <span id="sorter-progress-percent">0%</span>
+                        </div>
+                        <div class="progress-bar"><div id="sorter-progress-fill"></div></div>
+                    </div>
+                </div>
+                <div id="sorter-results" class="sorter-results hidden">
+                    <div class="results-header">
+                        <span id="results-count">0 Gambar ditemukan</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-primary btn-small" onclick="copyAllLinks()">Copy All</button>
+                            <button class="btn-success btn-small" onclick="downloadLinkList()">Save TXT</button>
+                        </div>
+                    </div>
+                    <div id="results-list" class="results-list"></div>
+                </div>
+            </div>
+        </main>
+
+        <footer><p>&copy; 2024 Manhwa Scraper Pro. Dibuat dengan jempol kaki. 🦵🔥</p></footer>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+            event.currentTarget.classList.add('active');
+        }
+
+        function copyCode(id) {
+            const code = document.getElementById(id);
+            code.select();
+            document.execCommand('copy');
+            alert('Kode berhasil dicopy!');
+        }
+
+        let currentImageUrls = [];
+
+        function extractLinks() {
+            const html = document.getElementById('sorter_html').value.trim();
+            const shouldSort = document.getElementById('enable-sort').checked;
+            const urls = html.match(/https?:\/\/[^\s<>"]+/g) || [];
+            let cleanUrls = [...new Set(urls.filter(u => /\.(jpg|jpeg|png|webp|avif|gif)/i.test(u) || u.includes('/chapter/') || u.includes('/manga/')))];
+            
+            if (shouldSort) {
+                // --- SMART NUMERICAL SORTING ---
+                cleanUrls.sort((a, b) => {
+                    const getFileName = (url) => {
+                        const parts = url.split('/');
+                        return parts[parts.length - 1] || "";
+                    };
+                    const aName = getFileName(a);
+                    const bName = getFileName(b);
+                    const aNum = aName.match(/\d+/g);
+                    const bNum = bName.match(/\d+/g);
+                    if (aNum && bNum) {
+                        return parseInt(aNum[aNum.length - 1]) - parseInt(bNum[bNum.length - 1]);
+                    }
+                    return aName.localeCompare(bName, undefined, {numeric: true, sensitivity: 'base'});
+                });
+            }
+
+            currentImageUrls = cleanUrls;
+            
+            const statusText = shouldSort ? "Sudah Diurutkan" : "Urutan Asli";
+            document.getElementById('results-count').innerText = `${currentImageUrls.length} Gambar ditemukan (${statusText})`;
+            const resultsList = document.getElementById('results-list');
+            resultsList.innerHTML = '';
+            if(currentImageUrls.length > 0) {
+                document.getElementById('sorter-results').classList.remove('hidden');
+                currentImageUrls.forEach(url => {
+                    const div = document.createElement('div');
+                    div.className = 'result-item';
+                    div.innerHTML = `<span class="result-url">${url}</span><button class="btn-icon" onclick="navigator.clipboard.writeText('${url}')">Copy</button>`;
+                    resultsList.appendChild(div);
+                });
+            } else {
+                alert('Tidak ada gambar ditemukan!');
+            }
+        }
+
+        async function downloadSortedZip() {
+            extractLinks();
+            if (currentImageUrls.length === 0) return;
+
+            const btn = document.getElementById('sorter-download-btn');
+            const statusBox = document.getElementById('sorter-status');
+            const progressFill = document.getElementById('sorter-progress-fill');
+            const progressPercent = document.getElementById('sorter-progress-percent');
+            const progressLabel = document.getElementById('sorter-progress-label');
+
+            btn.disabled = true;
+            statusBox.classList.remove('hidden');
+            
+            const zip = new JSZip();
+            const total = currentImageUrls.length;
+
+            for (let i = 0; i < total; i++) {
+                const url = currentImageUrls[i];
+                const num = (i + 1).toString().padStart(3, '0');
+                const proxyUrl = `/proxy_image?url=${encodeURIComponent(url)}`;
+                
+                try {
+                    const res = await fetch(proxyUrl);
+                    if (!res.ok) throw new Error('Blocked');
+                    const blob = await res.blob();
+                    zip.file(`${num}.jpg`, blob);
+                } catch (e) {
+                    console.warn(`Gagal: ${num}`);
+                }
+
+                const pct = Math.round(((i + 1) / total) * 100);
+                progressFill.style.width = `${pct}%`;
+                progressPercent.innerText = `${pct}%`;
+                progressLabel.innerText = `Mendownload ${i + 1}/${total}`;
+            }
+
+            const content = await zip.generateAsync({ type: 'blob' });
+            saveAs(content, `Manhwa_Sorted_${Date.now()}.zip`);
+            
+            btn.disabled = false;
+            progressLabel.innerText = "Selesai!";
+        }
+
+        // --- AUTO SCRAPER ENGINE ---
+        const startBtn = document.getElementById('start-btn');
+        startBtn.addEventListener('click', async () => {
+            const referer_url = document.getElementById('referer_url').value.trim();
+            const html_content = document.getElementById('html_content').value.trim();
+            if (!referer_url || !html_content) { alert('Isi URL dan Kode dulu!'); return; }
+
+            startBtn.classList.add('loading');
+            startBtn.disabled = true;
+            document.getElementById('status-container').classList.remove('hidden');
+            const logOutput = document.getElementById('log-output');
+            logOutput.innerHTML = '';
+            
+            function addLog(msg, type) {
+                const div = document.createElement('div');
+                div.className = `log-entry log-${type}`;
+                div.innerText = msg;
+                logOutput.appendChild(div);
+                logOutput.scrollTop = logOutput.scrollHeight;
+            }
+
+            try {
+                addLog('[*] Mengambil daftar gambar...', 'info');
+                const response = await fetch('/scrape', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ referer_url, html_content })
+                });
+                if (!response.ok) throw new Error('Gagal scraping.');
+
+                const { image_urls } = await response.json();
+                const zip = new JSZip();
+                const total = image_urls.length;
+                addLog(`[*] Menemukan ${total} gambar. Mendownload...`, 'info');
+
+                for (let i = 0; i < total; i++) {
+                    const url = image_urls[i];
+                    const num = (i + 1).toString().padStart(3, '0');
+                    const proxyUrl = `/proxy_image?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer_url)}`;
+                    try {
+                        const imgRes = await fetch(proxyUrl);
+                        if (!imgRes.ok) throw new Error('Blocked');
+                        const blob = await imgRes.blob();
+                        zip.file(`${num}.jpg`, blob);
+                        addLog(`[✓] Berhasil: ${num}`, 'info');
+                    } catch (e) {
+                        addLog(`[!] Gagal: ${num}`, 'error');
+                    }
+                    const pct = Math.round(((i + 1) / total) * 100);
+                    document.getElementById('progress-fill').style.width = `${pct}%`;
+                    document.getElementById('progress-percent').innerText = `${pct}%`;
+                    document.getElementById('progress-label').innerText = `Proses ${i+1}/${total}`;
+                }
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                saveAs(zipBlob, `Manhwa_Download_${Date.now()}.zip`);
+            } catch (err) {
+                addLog(`[!] Error: ${err.message}`, 'error');
+            } finally {
+                startBtn.classList.remove('loading');
+                startBtn.disabled = false;
+            }
+        });
+
+        function downloadLinkList() {
+            const list = currentImageUrls.join('\n');
+            saveAs(new Blob([list], {type: 'text/plain'}), 'links.txt');
+        }
+
+        async function copyAllLinks() {
+            await navigator.clipboard.writeText(currentImageUrls.join('\n'));
+            alert('Semua link dicopy!');
+        }
+    </script>
+</body>
+</html>
