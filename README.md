@@ -1,83 +1,66 @@
-# 📚 Manhwa Image Scraper Pro
+# 📚 Manhwa, Manhua & Manga Scraper Pro
 
-Aplikasi web dan CLI canggih untuk melakukan scraping gambar dari berbagai situs baca manhwa/manga/manhua. Dibangun dengan Python (Flask) dan dilengkapi dengan fitur *bypass protection* yang tangguh.
+Aplikasi web scraper serbaguna yang dirancang khusus untuk mempermudah pengunduhan chapter dari berbagai situs manhwa, manhua, dan manga. Aplikasi ini mengkombinasikan kekuatan backend Python (Flask) dengan frontend interaktif yang melakukan pengemasan ZIP langsung di browser!
 
-## ✨ Fitur Unggulan
+**Link Repositori:** [https://github.com/rekhzzz/manhwa-manhua-manga-scraper-by-rekhzz-samasta](https://github.com/rekhzzz/manhwa-manhua-manga-scraper-by-rekhzz-samasta)
 
-- **🛡️ Bypass Proteksi (Cloudflare & Hotlink):** Menggunakan `cloudscraper` dan proxy internal untuk melewati proteksi anti-bot dan *hotlink protection* dari situs-situs manhwa.
-- **🖼️ Auto-Convert Format Gambar:** Otomatis mendeteksi dan mengonversi format web modern seperti `WebP` dan `AVIF` menjadi `JPG`. Gambar transparan (seperti format RGBA/LA) otomatis diberi latar belakang hitam agar gambar tidak rusak.
-- **📂 Auto-Folder Management:** Pintar! Aplikasi akan otomatis membuat folder dengan nama manga dan chapter berdasarkan URL aslinya (contoh: `/downloads/judul-manga/chapter-1`).
-- **🚀 Dual Mode (Web UI & CLI):**
-  - **Web UI (`app.py`):** Antarmuka pengguna yang modern dan interaktif. Server otomatis membuka browser lokal saat dijalankan. Mendukung *proxying* gambar secara real-time.
-  - **CLI Mode (`scraper.py`):** Eksekusi cepat melalui terminal dengan membaca *source* dari `input.html`.
-- **⚡ Lazy-Load Support:** Mampu mengekstrak URL gambar sesungguhnya dari atribut seperti `data-src`, `data-lazy-src`, dan `data-srcset` (bukan mengambil gambar placeholder).
-- **🌐 Cloud Ready:** Konfigurasi sudah disesuaikan untuk deployment ke layanan serverless seperti **Vercel** (penyesuaian folder `/tmp`).
+## ✨ Fitur Utama (Web Structure)
+
+Aplikasi ini dibagi menjadi 3 tab utama di antarmuka web, masing-masing dengan kegunaan spesifik:
+
+### 1. 🤖 Auto Scraper
+- Cukup masukkan URL chapter dan kode HTML halaman tersebut.
+- Sistem akan mengekstrak semua link gambar secara otomatis (termasuk *lazy-loaded images*).
+- Gambar diunduh dan dikemas menjadi file **.zip** secara *real-time* langsung di browser kamu (menggunakan `JSZip`).
+- Mendukung proxy internal (`/proxy_image`) untuk menghindari blokir CORS atau *Hotlink Protection* dari target situs.
+
+### 2. 🚀 Bypass Injector (Pusat Senjata Bypass)
+Beberapa situs memiliki proteksi anti-bot tingkat tinggi yang sulit ditembus server biasa. Fitur ini menyediakan *script* JavaScript siap pakai untuk di-*inject* langsung ke *Console Browser* di situs target:
+- **Mode 1 (V3 Direct Download):** Script cepat yang otomatis mencomot semua gambar di halaman yang sedang kamu buka dan langsung mendownloadnya sebagai file ZIP.
+- **Mode 2 (V5 Link Extractor):** Script paling ampuh untuk ekstrak URL murni jika Mode V3 terkena *CORS error*. Ekstrak URL, copy, lalu paste di fitur *Link Sorter*.
+
+### 3. 📋 Link Sorter
+Sering dapat daftar link gambar yang urutannya berantakan?
+- Paste kode HTML atau daftar link murni ke sini.
+- **Smart Numerical Sorting:** Fitur ini dapat mendeteksi nomor halaman di dalam nama file gambar dan mengurutkannya secara otomatis dengan benar (misalnya `001.jpg`, `002.jpg`, dst).
+- Download hasil yang sudah rapi langsung sebagai file **.zip** atau simpan daftarnya dalam format `.txt`.
 
 ## 🛠️ Persyaratan Sistem
 
 - Python 3.8 atau versi yang lebih baru.
+- Browser modern (Chrome/Edge/Firefox) untuk menjalankan UI dan JSZip.
 
-## 📦 Instalasi
+## 📦 Instalasi & Cara Menjalankan
 
 1. **Clone repositori ini:**
    ```bash
-   git clone https://github.com/USERNAME_KAMU/my-manhwa-scraper.git
-   cd my-manhwa-scraper
+   git clone https://github.com/rekhzzz/manhwa-manhua-manga-scraper-by-rekhzz-samasta.git
+   cd manhwa-manhua-manga-scraper-by-rekhzz-samasta
    ```
-   *(Jangan lupa ubah `USERNAME_KAMU` dengan username GitHub milikmu)*
 
-2. **Install dependensi yang dibutuhkan:**
+2. **Install dependensi Python:**
    ```bash
    pip install -r requirements.txt
    ```
-   *Dependensi utama meliputi: Flask, requests, beautifulsoup4, Pillow, cloudscraper.*
 
-## 🚀 Cara Penggunaan
-
-### Mode 1: Menggunakan Web Interface (Rekomendasi)
-
-Jalankan server web lokal dengan perintah:
-```bash
-python app.py
-```
-*Atau, kamu bisa cukup klik dua kali pada file `Jalankan_Scraper.bat` (jika menggunakan Windows).*
-
-Server akan berjalan dan otomatis membuka tab baru di browsermu (biasanya di `http://127.0.0.1:8000`). Kamu tinggal mengikuti instruksi di antarmuka web.
-
-### Mode 2: Menggunakan CLI / Terminal
-
-1. Buka halaman chapter manhwa di browsermu.
-2. Lakukan *Inspect Element* atau lihat *Page Source*, lalu salin elemen HTML yang berisi gambar-gambarnya.
-3. Tempel (paste) HTML tersebut ke dalam file `input.html`.
-4. Jalankan script scraper:
+3. **Jalankan Aplikasi:**
    ```bash
-   python scraper.py
+   python app.py
    ```
-5. Saat diminta di terminal, masukkan URL asal (Referer) dari chapter tersebut.
-6. Gambar akan mulai diunduh otomatis ke dalam folder `downloads/judul-manga/chapter-XX`.
+   *Atau klik dua kali pada `Jalankan_Scraper.bat` jika menggunakan Windows.*
 
-## 📁 Struktur Direktori
+4. Aplikasi akan otomatis membuka browser di alamat `http://127.0.0.1:8000`.
 
-```text
-my-manhwa-scraper/
-├── app.py                # File utama untuk menjalankan Web UI (Flask)
-├── scraper.py            # File utama untuk mode CLI
-├── requirements.txt      # Daftar pustaka Python yang dibutuhkan
-├── input.html            # File input HTML untuk mode CLI
-├── vercel.json           # Konfigurasi deployment untuk Vercel
-├── Jalankan_Scraper.bat  # Script cepat untuk menjalankan server (Windows)
-├── downloads/            # Direktori hasil unduhan gambar (otomatis dibuat)
-├── static/               # File statis web (CSS, JS, dll)
-└── templates/            # File template HTML untuk Web UI (index.html)
-```
+## 📁 Struktur Proyek Utama
+
+- `app.py`: Backend server (Flask) yang menangani proxy gambar dan bypass Cloudflare.
+- `scraper.py`: Mode CLI alternatif untuk eksekusi via terminal murni.
+- `templates/index.html`: Struktur utama Web UI (menampung logika JSZip, Auto Scraper, Injector, Sorter).
+- `static/style.css`: Desain UI keren dengan efek Glassmorphism.
 
 ## ⚠️ Disclaimer
 
-Alat ini dibuat semata-mata untuk tujuan edukasi (web scraping, manipulasi gambar dengan Python, dan manajemen network/HTTP). Pengguna bertanggung jawab penuh atas penggunaan alat ini. Mohon gunakan dengan bijak dan selalu hormati hak cipta dari pembuat/pemilik karya.
-
-## 🤝 Kontribusi
-
-Kontribusi untuk pengembangan proyek ini selalu terbuka! Silakan lakukan *Fork*, buat *Branch* baru untuk fiturmu, dan kirimkan *Pull Request*.
+Alat ini dibuat semata-mata untuk tujuan edukasi, penanganan DOM, dan *network proxying*. Pengguna bertanggung jawab penuh atas segala aktivitas unduhan. Mohon hormati pembuat dan *publisher* resmi dari komik tersebut.
 
 ---
-Dibuat dengan ❤️ untuk kemudahan membaca secara offline.
+Dibuat dengan ❤️ oleh Rekhzz Samasta.🦵🔥
