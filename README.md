@@ -3,6 +3,7 @@
 Aplikasi web scraper serbaguna yang dirancang khusus untuk mempermudah pengunduhan chapter dari berbagai situs manhwa, manhua, dan manga. Aplikasi ini mengkombinasikan kekuatan backend Python (Flask) dengan frontend interaktif yang melakukan pengemasan ZIP langsung di browser!
 
 **Link Repositori:** [https://github.com/rekhzzz/manhwa-manhua-manga-scraper-by-rekhzz-samasta](https://github.com/rekhzzz/manhwa-manhua-manga-scraper-by-rekhzz-samasta)
+
 **Website Aplikasi (Siap Pakai):** [https://my-manhwa-scraper.vercel.app/](https://my-manhwa-scraper.vercel.app/)
 
 ## ✨ Fitur Utama (Web Structure)
